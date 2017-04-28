@@ -1,16 +1,16 @@
 {
-    "name": "jquery-tag-editor",
+    "name": "jquery-input-tags",
 	"description": "A powerful and lightweight tag editor plugin for jQuery.",
-    "version": "1.0.20",
+    "version": "1.0.0",
     "dependencies": {
         "jquery": ">=1.7",
         "caret": null
     },
-    "homepage": "https://github.com/Pixabay/jQuery-tagEditor",
+    "homepage": "https://github.com/lzp9421/jQuery-inputTags",
     "authors": [{
-        "name": "Simon Steinberger",
-        "url": "https://pixabay.com/users/Simon/",
-        "email": "simon@pixabay.com"
+        "name": "lizhipeng",
+        "url": "http://lap.name/",
+        "email": "mail@lzp.name"
     }],
     "keywords": [
         "tags",

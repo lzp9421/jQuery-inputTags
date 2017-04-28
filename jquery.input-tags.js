@@ -1,15 +1,14 @@
-/*
-	jQuery tagEditor v1.0.20
-    Copyright (c) 2014 Simon Steinberger / Pixabay
-    GitHub: https://github.com/Pixabay/jQuery-tagEditor
-	License: http://www.opensource.org/licenses/mit-license.php
-*/
-
-(function($){
+/**
+ * Jquery.inputTags v1.0.0
+ * Created by lizhipeng on 2017/4/26.
+ * GitHub: https://github.com/lzp9421/jQuery-inputTags
+ */
+!function($){
     // auto grow input (stackoverflow.com/questions/931207)
     $.fn.tagEditorInput=function(){var t=" ",e=$(this),n=parseInt(e.css("fontSize")),i=$("<span/>").css({position:"absolute",top:-9999,left:-9999,width:"auto",fontSize:e.css("fontSize"),fontFamily:e.css("fontFamily"),fontWeight:e.css("fontWeight"),letterSpacing:e.css("letterSpacing"),whiteSpace:"nowrap"}),s=function(){if(t!==(t=e.val())){i.text(t);var s=i.width()+n;20>s&&(s=20),s!=e.width()&&e.width(s)}};return i.insertAfter(e),e.bind("keyup keydown focus",s)};
 
     // plugin with val as parameter for public methods
+    // jQuery tagEditor v1.0.20 GitHub: https://github.com/Pixabay/jQuery-tagEditor
     $.fn.tagEditor = function(options, val, blur){
 
         // helper
@@ -110,10 +109,10 @@
 
                 if (o.maxTags && ed.data('tags').length >= o.maxTags) { ed.find('input').blur(); return false; }
 
-                blur_result = true
+                blur_result = true;
                 $('input:focus', ed).blur();
                 if (!blur_result) return false;
-                blur_result = true
+                blur_result = true;
 
                 // always remove placeholder on click
                 $('.placeholder', ed).remove();
@@ -203,7 +202,7 @@
                     li.before('<li><div class="tag-editor-spacer">&nbsp;'+o.delimiter[0]+'</div><div class="tag-editor-tag">'+escape(tag)+'</div><div class="tag-editor-delete"><i></i></div></li>');
                     if (o.maxTags && old_tags.length >= o.maxTags) { exceeded = true; break; }
                 }
-                input.attr('maxlength', o.maxLength).removeData('old_tag').val('')
+                input.attr('maxlength', o.maxLength).removeData('old_tag').val('');
                 if (exceeded) input.blur(); else input.focus();
                 update_globals();
             }
@@ -355,7 +354,7 @@
         maxLength: 50,
         delimiter: ',;',
         placeholder: '',
-        forceLowercase: true,
+        forceLowercase: false,
         removeDuplicates: true,
         clickDelete: false,
         animateDelete: 175,
@@ -367,4 +366,120 @@
         beforeTagSave: function(){},
         beforeTagDelete: function(){}
     };
-}(jQuery));
+
+    //
+    //数组功能扩展
+    Array.prototype.each = function(fn){
+        fn = fn || Function.K;
+        var a = [];
+        var args = Array.prototype.slice.call(arguments, 1);
+        for(var i = 0; i < this.length; i++){
+            var res = fn.apply(this,[this[i],i].concat(args));
+            if(res !== null) a.push(res);
+        }
+        return a;
+    };
+    //数组是否包含指定元素
+    Array.prototype.contains = function(suArr){
+        for(var i = 0; i < this.length; i ++){
+            if(this[i] === suArr){
+                return true;
+            }
+        }
+        return false;
+    };
+    //不重复元素构成的数组
+    Array.prototype.uniquelize = function(){
+        var ra = new Array();
+        for(var i = 0; i < this.length; i ++){
+            if(!ra.contains(this[i])){
+                ra.push(this[i]);
+            }
+        }
+        return ra;
+    };
+    //两个数组的补集
+    Array.complement = function(a, b){
+        return Array.minus(Array.union(a, b),Array.intersect(a, b));
+    };
+    //两个数组的交集
+    Array.intersect = function(a, b){
+        return a.uniquelize().each(function(o){return b.contains(o) ? o : null});
+    };
+    //两个数组的差集
+    Array.minus = function(a, b){
+        return a.uniquelize().each(function(o){return b.contains(o) ? null : o});
+    };
+    //两个数组并集
+    Array.union = function(a, b){
+        return a.concat(b).uniquelize();
+    };
+
+    //----------------------------------------
+    
+    $.extend({
+        inputTags: function (options, val, blur) {
+            var input             = $('#' + options.inputId);
+            var panel             = $('#' + options.panelId);
+            var selected_tags     = options.selectedTags || [];
+            var all_tags          = options.allTags || [];
+            var before_tag_save   = options.beforeTagSave;
+            var before_tag_delete = options.beforeTagDelete;
+            delete options.inputId;
+            delete options.panelId;
+            delete options.selectedTags;
+            delete options.allTags;
+
+            //input 关联panel
+            var setTag = function (o, t, b) {
+                var tags = o.find('span:contains(' + t + ')');
+                tags.each(function (i, e) {
+                    if ($(e).text() === t) {
+                        $(e).siblings('input[type="checkbox"]').prop("checked", b);
+                    }
+                });
+            };
+            options.beforeTagSave = function(field, editor, tags, tag, val) {
+                // Remove tag + tag; add tag + val
+                tag && setTag(panel, tag, false); // 表示修改，先删除tsgs
+                val && setTag(panel, val, true);  // 添加
+                before_tag_save && before_tag_save(field, editor, tags, val);
+            };
+            options.beforeTagDelete = function(field, editor, tags, val) {
+                // Remove tag + val;
+                // 删除
+                setTag(panel, val, false);
+                before_tag_delete && before_tag_delete(field, editor, tags, val);
+            };
+
+            options.initialTags = selected_tags = Array.intersect(selected_tags, all_tags);
+            input.tagEditor(options, val, blur);
+
+            // 绘制pannel
+            var createPanel = function (tags) {
+                var tag;
+                for (var i = 0; i < tags.length; i++) {
+                    tag = tags[i];
+                    var label    = $('<label>').attr('for', 'label-' + i);
+                    var checkbox = $('<input>').attr('type', 'checkbox').attr('id', 'label-' + i).css('display', 'none');
+                    var span     = $('<span>').addClass('label label-info').text(tag);
+                    panel.append(label.append(checkbox, span));
+                }
+            };
+            createPanel(all_tags);
+
+            // panel关联input
+            panel.find('input[type="checkbox"]').on('change', function () {
+                var tag = $(this).siblings('span').text();
+                if ($(this).is(':checked')) {
+                    // 选中
+                    input.tagEditor('addTag', tag);
+                } else  {
+                    // 未选中
+                    input.tagEditor('removeTag', tag);
+                }
+            });
+
+        }
+    });
+}(jQuery);

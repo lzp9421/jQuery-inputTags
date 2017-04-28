@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="jquery.input-tags.css">
+    <link rel="stylesheet" href="//apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.min.css">
+    <style>
+        .tags-panel label {
+            margin: 2px 6px;
+        }
+        .tags-panel input {
+            display: none;
+        }
+        .tags-panel input:checked + span.label{
+            background: #5cb85c;
+        }
+
+    </style>
+</head>
+<body>
+
+<input type="text" id="tags-editor">
+<div id="tags-panel" class="tags-panel"></div>
+
+<script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="./jquery.caret.min.js"></script>
+<script src="./jquery.input-tags.min.js"></script>
+<script>
+
+    $.inputTags({
+        inputId: 'tags-editor',
+        panelId: 'tags-panel',
+        allTags: ['asaa', 'asas', 'dD']
+    });
+</script>
+</body>
+</html>

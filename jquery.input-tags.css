@@ -34,6 +34,16 @@
 
 .tag-editor .tag-editor-tag.active { background: none !important; }
 
+.tags-panel label {
+    margin: 2px 6px;
+}
+.tags-panel input {
+    display: none;
+}
+.tags-panel input:checked + span.label{
+    background: #5cb85c;
+}
+
 /* jQuery UI autocomplete - code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css */
 .ui-autocomplete { position: absolute; top: 0; left: 0; cursor: default; font-size: 14px; }
 .ui-front { z-index: 9999; }
